@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>manageme-app</title>
+  </head>
+  <body>
+    <div id="app">
+    <h1>Manage me</h1>
+
+    <form id="project-form">
+      <input type="hidden" id="project-id">
+      <input type="text" id="project-name" placeholder="Project name" required>
+      <textarea type="text" id="project-desc" placeholder="Project description"></textarea>
+
+      <button type="submit" id="submit-btn">Save Project</button>
+    </form>
+
+    <!-- горизонтальная линия -->
+    <hr> 
+
+    <div id="project-list"></div>
+
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
