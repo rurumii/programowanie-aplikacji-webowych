@@ -12,6 +12,9 @@ const idInput = document.querySelector<HTMLInputElement>('#project-id')!;
 const nameInput = document.querySelector<HTMLInputElement>('#project-name')!;
 const descInput = document.querySelector<HTMLInputElement>('#project-desc')!;
 
+// function init(){
+
+// }
 
 // функция отрисовки (рендер)
 function render(){
@@ -33,7 +36,7 @@ function render(){
   });
 }
 
-
+render();
 form.addEventListener('submit', (e) =>{
   e.preventDefault(); // чтобы страница не перезагружалась
 
