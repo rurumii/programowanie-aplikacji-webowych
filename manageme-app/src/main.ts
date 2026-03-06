@@ -1,8 +1,10 @@
 import './style.css'
 import { ProjectService } from './projectService'
 import type { Project } from './types'
+import { UserService } from './userService';
 
 const service = new ProjectService();
+const userService = new UserService();
 
 const form = document.querySelector<HTMLFormElement>('#project-form')!;
 const listContainer = document.querySelector<HTMLFormElement>('#project-list')!;
@@ -36,7 +38,20 @@ function render(){
   });
 }
 
+function renderUserInfo() {
+  const userDisplay = document.querySelector<HTMLDivElement>('#user-display')!;
+  const user = userService.getCurrentUser();
+
+  userDisplay.innerHTML = `
+  <div class="user-badge">
+    <span>${user.name} ${user.surname}</span>
+  </div>
+    `;
+}
+
 render();
+renderUserInfo();
+
 form.addEventListener('submit', (e) =>{
   e.preventDefault(); // чтобы страница не перезагружалась
 

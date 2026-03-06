@@ -130,3 +130,24 @@ hr {
 .delete-btn:hover {
   background-color: #fed7d7;
 }
+/* Контейнер для хедера */
+#app-header {
+  display: flex;
+  justify-content: flex-end; /* Смещаем имя вправо */
+  margin-bottom: 20px;
+  padding: 10px;
+}
+
+/* Сама плашка */
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #242a41 0%, #979ec5 100%);
+  color: rgb(211, 205, 229);
+  padding: 8px 16px;
+  border-radius: 50px; /* Эффект капсулы */
+  font-weight: 500;
+  box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
+  font-size: 0.9rem;
+}
