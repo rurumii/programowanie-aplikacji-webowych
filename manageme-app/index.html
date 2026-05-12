@@ -25,10 +25,54 @@
     <!-- горизонтальная линия -->
     <hr> 
 
+    <h2>Project list</h2>
+
     <div id="project-list"></div>
 
-    </div>
+    
 
+    <section id="stories-section" style="display: none;"> <hr>
+      <h2>Project's tasks <span id="active-project-name"></span></h2>
+
+      <form id="story-form">
+        <input type="hidden" id="story-id">
+        <input type="text" id="story-name" placeholder="Task title" required>
+        <textarea id="story-desc" placeholder="Task description"></textarea>
+
+        <div class="form-row">
+          <select id="story-priority">
+            <option value="low">low priority</option>
+            <option value="medium" selected>medium priority</option>
+            <option value="high">high priority</option>
+          </select>
+
+          <select id="story-status">
+            <option value="todo">to do</option>
+            <option value="doing">in progress</option>
+            <option value="done">done</option>
+          </select>
+        </div>
+
+        <button type="submit" id="save-story-btn">Add Task</button>
+
+      </form>
+
+      <div class="kanban-board">
+        <div class="column" id="col-todo">
+          <h3>Need to be done <span>(0)</span></h3>
+          <div class="story-list"></div>
+        </div>
+        <div class="column" id="col-doing">
+          <h3>in progress <span>(0)</span></h3>
+          <div class="story-list"></div>
+        </div>
+        <div class="column" id="col-done">
+          <h3>Done <span>(0)</span></h3>
+          <div class="story-list"></div>
+        </div>
+      </div>
+    </section>
+</div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

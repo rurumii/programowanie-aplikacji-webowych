@@ -16,10 +16,12 @@ export class ProjectService {
     save(project: Project) : void {
         // получение всех
         const projects = this.getAll();
+        // ищем айди параметра в массиве всех проектов
         const index = projects.findIndex(p => p.id === project.id);
 
         if (index !== -1){
-            // если проект с таким айди существует => заменяем (апдейт)
+            // если проект с таким айди существует => заменяем (апдейт);
+            // если нет - добавляем в массив
             projects[index] = project;
         } else {
             projects.push(project);
@@ -31,12 +33,12 @@ export class ProjectService {
 
     // удаление (оставляем в массиве всё кроме проекта с указанным айди)
     delete(id: string) : void {
-        // фильтр переписывает массив оставляя все массивы кроме того что в id
+        // фильтр переписывает, создаёт новый массив оставляя все элементы которые не равны айди в парамертеп
         const projects = this.getAll().filter(p=> p.id !== id);
         localStorage.setItem(this.storageKey, JSON.stringify(projects));
     }
 
-    // поиск
+    // поиск; достаточно только айди в параметре 
     getById(id: string): Project | undefined {
         return this.getAll().find(p=> p.id === id);
     }
