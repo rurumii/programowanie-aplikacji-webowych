@@ -32,7 +32,7 @@
     
 
     <section id="stories-section" style="display: none;"> <hr>
-      <h2>Project's tasks <span id="active-project-name"></span></h2>
+      <h2>Project's Stories <span id="active-project-name"></span></h2>
 
       <form id="story-form">
         <input type="hidden" id="story-id">
@@ -53,7 +53,7 @@
           </select>
         </div>
 
-        <button type="submit" id="save-story-btn">Add Task</button>
+        <button type="submit" id="save-story-btn">Add Story</button>
 
       </form>
 
@@ -72,6 +72,75 @@
         </div>
       </div>
     </section>
+        <section id="tasks-section" style="display: none;"> 
+      <hr>
+      <h2>Tasks for Story <span id="active-story-name"></span></h2>
+      <button id="back-to-stories-btn" style="margin-bottom: 20px;">← Back to Stories</button>
+
+      <form id="task-form">
+        <input type="hidden" id="task-id">
+        <input type="text" id="task-name" placeholder="Task name" required>
+        <textarea id="task-desc" placeholder="Task description"></textarea>
+
+        <div class="form-row">
+          <select id="task-priority">
+            <option value="low">low priority</option>
+            <option value="medium" selected>medium priority</option>
+            <option value="high">high priority</option>
+          </select>
+
+          <input type="number" id="task-estimated-time" placeholder="Estimated hours" min="1" required>
+        </div>
+
+        <button type="submit" id="save-task-btn">Add Task</button>
+      </form>
+
+      <div class="kanban-board">
+        <div class="column" id="task-col-todo">
+          <h3>To Do</h3>
+          <div class="task-list"></div>
+        </div>
+        <div class="column" id="task-col-doing">
+          <h3>In Progress</h3>
+          <div class="task-list"></div>
+        </div>
+        <div class="column" id="task-col-done">
+          <h3>Done</h3>
+          <div class="task-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <dialog id="task-details-modal">
+      <div class="modal-content">
+        <h3 id="modal-task-name">Task Name</h3>
+        <p id="modal-task-desc">Description</p>
+        
+        <div class="task-meta">
+           <p><strong>Status:</strong> <span id="modal-task-status"></span></p>
+           <p><strong>Est. Time:</strong> <span id="modal-task-est"></span>h</p>
+           <p><strong>Start Date:</strong> <span id="modal-task-start">-</span></p>
+           <p><strong>End Date:</strong> <span id="modal-task-end">-</span></p>
+           <p><strong>Assignee:</strong> <span id="modal-task-assignee">Unassigned</span></p>
+        </div>
+        
+        <hr>
+
+        <div id="assign-section">
+            <select id="assign-user-select">
+                </select>
+            <button id="assign-user-btn">Assign & Start (Doing)</button>
+        </div>
+
+        <div id="done-section" style="display: none; margin-top: 10px;">
+            <button id="mark-done-btn" style="background-color: #b5e4ca; color: #4a4542;">Mark as Done</button>
+        </div>
+
+        <div style="margin-top: 20px; text-align: right;">
+          <button id="close-modal-btn">Close</button>
+        </div>
+      </div>
+    </dialog>
 </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

@@ -264,3 +264,30 @@ button[type="submit"]:hover {
   color: #d9534f;
   border-color: #ffdce0;
 }
+
+/* Стили для модального окна */
+dialog {
+  border: none;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  background-color: var(--card-bg);
+  color: var(--text-main);
+  max-width: 400px;
+  width: 100%;
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.4); /* Затемнение фона вокруг окна */
+}
+
+.task-meta p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+#assign-section {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
