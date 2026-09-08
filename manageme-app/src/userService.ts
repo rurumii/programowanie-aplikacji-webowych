@@ -1,8 +1,13 @@
 import type { User } from "./types";
+import { ApiClient} from "./apiService";
+
 
 export class UserService {
+    private api = new ApiClient();
+    private readonly storageKey = 'manageme_users';
+
     // имитированный пользователь (мок/заглушка)
-    private users: User[] = [
+    private readonly defaultUsers: User[] = [
         {
         id: 'admin-1',
         name: 'Karinka',
@@ -23,17 +28,26 @@ export class UserService {
         }];
  
     // метод возвращающий данные залогиненного юзера
-    getCurrentUser(): User{
-        const admin = this.users.find(u=>u.role==='admin');
-        return admin || this.users[0]; //<= на всякий случай возвращаем хотя бы первого
+    async getCurrentUser(): Promise<User>{
+        const users = await this.getAllUsers();
+        const admin = users.find(u=>u.role==='admin');
+        return admin || users[0]; //<= на всякий случай возвращаем хотя бы первого
     }
-
-    getAllUsers(): User[]{
-        return this.users;
+    async getAllUsers(): Promise<User[]>{
+        let usersFromDb = await this.api.get<User>(this.storageKey);
+        // seeding
+        if (usersFromDb.length === 0) {
+            for (const user of this.defaultUsers)
+            {
+                await this.api.save(this.storageKey, user);
+            }
+            usersFromDb = this.defaultUsers;
+        }
+        return usersFromDb;
     }
-
-    getAssignableUsers(): User[]
+    async getAssignableUsers(): Promise<User[]>
     {
-        return this.users.filter(u=>u.role!=='admin');
+        const users = await this.getAllUsers();
+        return users.filter(u=>u.role!=='admin');
     }
 }

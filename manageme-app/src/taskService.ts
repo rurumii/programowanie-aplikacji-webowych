@@ -1,55 +1,38 @@
 import type { Task, Status, Priority } from "./types";
 import { StoryService } from "./storyService";
+import { ApiClient } from "./apiService";
 
 export class TaskService {
     private storageKey = 'tasks_data';
     private storyService = new StoryService();
+    private api = new ApiClient();
 
 
-// crud
 
-getAllTasks(): Task[]{
-    const data = localStorage.getItem(this.storageKey);
-    return data? JSON.parse(data) : [];
+async getAllTasks(): Promise<Task[]>{
+    return await this.api.get<Task>(this.storageKey);
 }
-
-getTasksByStory(storyId:string): Task[]
+async getTaskById(id:string):Promise<Task | undefined>
 {
-    return this.getAllTasks().filter(t=>t.storyId===storyId);
+    return await this.api.getById<Task>(this.storageKey,id);
 }
-
-getTaskById(id:string): Task | undefined
+async getTasksByStory(storyId:string): Promise<Task[]>
 {
-    return this.getAllTasks().find(t=>t.id===id);
+    const allTasks = await this.getAllTasks();
+    return allTasks.filter(t=>t.storyId===storyId);
 }
-// create/update (upsert)
-
-save(task: Task): void{
-    const tasks = this.getAllTasks();
-    const index = tasks.findIndex(t=>t.id===task.id);
-    if (index > -1)
-    {
-        // если вернулась цифра н.п.2 значит такая задача существует
-        tasks[index] = task; // <= переписываем старую задачу актуальными данными
-    } else // создаем новую задачу 
-    {
-        tasks.push(task);
-    }
-    localStorage.setItem(this.storageKey, JSON.stringify(tasks))
+async save(task: Task): Promise<void>{
+    await this.api.save<Task>(this.storageKey, task);
 }
-
-// delete
-delete(id:string): void{
-    const tasks = this.getAllTasks();
-    const updatedTasks = tasks.filter(t=>t.id!== id);
-    localStorage.setItem(this.storageKey, JSON.stringify(updatedTasks));
+async delete(id:string): Promise<void>{
+    await this.api.delete(this.storageKey,id);
 }
 
 // бизнес логика
 // 1. назначить человека на задачу
-assignUser(taskId:string,userId:string): void
+async assignUser(taskId:string,userId:string): Promise<void>
 {
-    const task=this.getTaskById(taskId);
+    const task= await this.getTaskById(taskId);
     
     if(!task) return;
 
@@ -58,43 +41,41 @@ assignUser(taskId:string,userId:string): void
     task.status='doing';
     task.startDate=new Date().toISOString();
 
-    this.save(task); // сохраняем измененную задачу
+    await this.save(task); // сохраняем измененную задачу
 
     // Jeśli historyjka miała stan 'todo' - zmieniamy na 'doing'
-    const story = this.storyService.getStoryById(task.storyId);
+    const story = await this.storyService.getStoryById(task.storyId);
     if (story && story.status === 'todo')
     {
         story.status='doing';
-        this.storyService.save(story);
+        await this.storyService.save(story);
     }
 }
 // 2. завершение задачи
-markAsDone(taskId:string):void
+async markAsDone(taskId:string):Promise<void>
 {
-    const task = this.getTaskById(taskId);
+    const task = await this.getTaskById(taskId);
     if (!task) return;
 
-    //
     task.status='done';
     task.endDate=new Date().toISOString();
-    this.save(task);
+    await this.save(task);
 
     // Jeśli wszystkie zadania są zakończone - zmieniamy na 'done'
-    
-    this.checkAndUpdateStoryStatus(task.storyId); // <= вспомогательный метод
+    await this.checkAndUpdateStoryStatus(task.storyId); // <= вспомогательный метод
 }
-    private checkAndUpdateStoryStatus(storyId:string):void{
-        const allStoryTasks = this.getTasksByStory(storyId);
+private async checkAndUpdateStoryStatus(storyId:string):Promise<void>{
+        const allStoryTasks = await this.getTasksByStory(storyId);
 
         // проверяем есть ли таски; у них статус done?
         const allAreDone = allStoryTasks.length>0&&allStoryTasks.every(t=>t.status==='done');
         if(allAreDone)
         {
-            const story = this.storyService.getStoryById(storyId);
+            const story = await this.storyService.getStoryById(storyId);
             if (story&&story.status!=='done') // <=проверка есть ли стори и имеет ли статус дан (если нет - меняем)
             {
                 story.status='done';
-                this.storyService.save(story);
+                await this.storyService.save(story);
             }
         }
 }

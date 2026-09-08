@@ -1,65 +1,38 @@
 import type { Story } from "./types";
+import { ApiClient } from "./apiService";
 
 export class StoryService {
     private readonly activeProjectKey = 'manageme_active_proj'
     private readonly storageKey = 'manageme_stories'; // ключ для всех задач
+    private api = new ApiClient();
 
     //
     setActiveProject(projectId: string) : void {
         // setitem - сохранить
         localStorage.setItem(this.activeProjectKey, projectId);
     }
-
-    //
     getActiveProjectId(): string | null {
         return localStorage.getItem(this.activeProjectKey);
     }
-    // Получить ВООБЩЕ ВСЕ задачи из базы
-    getAllStories(): Story[] {
-        const data = localStorage.getItem(this.storageKey);
-        // return data ? JSON.parse(data) : [];
-        if (data)
-        {
-            const parsedData = JSON.parse(data) as Story[];
-            return parsedData;
-        } else {
-            return [];
-        }
-       
-    }
+    //
 
-    // получить задачи только для конкретного проекта (фильтрация)
-    getStoriesByProject(projectId: string): Story[] {
-        return this.getAllStories().filter(s => s.projectId === projectId);
+    // work w/db
+    async getAllStories(): Promise<Story[]> {
+        return await this.api.get<Story>(this.storageKey);
     }
-
-    getStoryById(id: string): Story | undefined
+    async getStoryById(id: string): Promise<Story|undefined>
     {
-        const allStories = this.getAllStories();
-        return allStories.find(s=>s.id===id);
+        return await this.api.getById<Story>(this.storageKey,id);
     }
-
-    deleteStory(id:string): void
+    async getStoriesByProject(projectId: string): Promise<Story[]> {
+        const allStories=await this.getAllStories();
+        return allStories.filter(s => s.projectId === projectId); 
+    }
+    async deleteStory(id:string): Promise<void>
     {
-        const stories = this.getAllStories();
-        const updatedStories = stories.filter(s=>s.id!==id);
-
-        localStorage.setItem(this.storageKey, JSON.stringify(updatedStories));
+        await this.api.delete(this.storageKey,id);
     }
-
-
-    // сохранить или обновить задачу
-    save(story: Story): void {
-        const allStories = this.getAllStories();
-        const index = allStories.findIndex(s => s.id === story.id);
-        
-        if (index > -1) {
-            allStories[index] = story; // обновляем старую
-        } else {
-            allStories.push(story); // добавляем новую
-        }
-        localStorage.setItem(this.storageKey, JSON.stringify(allStories));
+    async save(story: Story): Promise<void> { //save+update
+        await this.api.save<Story>(this.storageKey,story);
     }
 }
-// остановилась на том что разобрала типы/стори/юзер(мок)/проджект сервисы
-// далее мейн тс
