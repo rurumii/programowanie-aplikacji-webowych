@@ -2,178 +2,122 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>manageme-app</title>
   </head>
-  <body class="bg-gradient-to-br from-[#e1e6e5] via-[#d0dcd9] to-[#a3b3b1] dark:from-[#121619] dark:via-[#1a2327] dark:to-[#202a30] bg-fixed text-storm-800 dark:text-storm-100 min-h-screen p-4 md:p-8 transition-colors duration-300">
-    <div id="app" class="max-w-5xl mx-auto w-full">
-    
-      <h1 class="text-3xl font-bold text-center mb-8 tracking-wide">Manage me</h1>
+  <body class="bg-gradient-to-br from-[#e1e6e5] via-[#d0dcd9] to-[#a3b3b1] min-h-screen text-storm-800 p-4 md:p-8">
+    <div id="app-container" class="max-w-5xl mx-auto w-full">
+      <h1 class="text-3xl font-bold text-center mb-8">Manage me</h1>
       
-      <header id="app-header" class="mb-6 flex justify-between items-center">
-        <!-- БЛОК ПОЛЬЗОВАТЕЛЯ И УВЕДОМЛЕНИЙ -->
-        <div class="flex items-center gap-4">
-          <div id="user-display" class="font-medium text-lg"></div>
-          
-          <button id="notification-bell" class="relative p-2 rounded-lg bg-white/40 dark:bg-storm-800/50 backdrop-blur-md hover:bg-white/60 transition-colors border border-white/50" aria-label="Notifications">
-            🔔 
-            <span id="notification-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden shadow-sm">0</span>
-          </button>
-        </div>
-        
-        <button id="theme-toggle" class="p-2 rounded-lg bg-storm-500 text-white hover:bg-storm-500/80 dark:bg-storm-700 dark:text-storm-300 dark:hover:bg-storm-500 transition-colors shadow-sm" aria-label="Toggle Dark Mode">
-          <svg class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
-          </svg>
-          <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path>
-          </svg>
+      <!-- экран логин  -->
+      <section id="login-screen" class="max-w-md mx-auto bg-white/60 p-8 rounded-xl shadow-lg border border-white/50 text-center">
+        <h2 class="text-xl font-bold mb-6">Log In with Google</h2>
+        <button id="real-google-login-btn" class="px-6 py-3 bg-storm-500 text-white rounded-lg font-medium hover:bg-storm-600 shadow-md flex items-center justify-center gap-3 mx-auto w-full transition-all">
+          <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Sign in with Google
         </button>
-      </header>
-
-      <!-- ФОРМА ПРОЕКТОВ -->
-      <form id="project-form" class="bg-white/40 dark:bg-storm-800/50 backdrop-blur-md p-6 rounded-xl shadow-lg border border-white/60 dark:border-storm-700 flex flex-col gap-4 mb-6 transition-colors">
-        <input type="hidden" id="project-id">
-        <input type="text" id="project-name" placeholder="Project name" required class="w-full p-3 rounded-lg border border-white/50 dark:border-storm-600 bg-white/50 dark:bg-storm-900/50 text-storm-800 dark:text-storm-300 focus:ring-2 focus:ring-storm-500 outline-none transition-all">
-        <textarea id="project-desc" placeholder="Project description" class="w-full p-3 rounded-lg border border-white/50 dark:border-storm-600 bg-white/50 dark:bg-storm-900/50 text-storm-800 dark:text-storm-300 focus:ring-2 focus:ring-storm-500 outline-none transition-all min-h-[80px]"></textarea>
-        <button type="submit" id="submit-btn" class="mt-2 w-full sm:w-auto self-start px-6 py-3 bg-storm-500 hover:bg-storm-500/90 dark:bg-storm-700 dark:hover:bg-storm-500 text-white font-medium rounded-lg transition-colors shadow-md">Save Project</button>
-      </form>
-
-      <hr class="border-t border-storm-300 dark:border-storm-700 my-8 opacity-50"> 
-
-      <h2 class="text-2xl font-semibold mb-6 text-storm-900 dark:text-storm-100">Project list</h2>
-      <div id="project-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-
-      <!-- СЕКЦИЯ СТОРЕЙ -->
-      <section id="stories-section" style="display: none;"> 
-        <hr class="border-t border-storm-300 dark:border-storm-700 my-8 opacity-50">
-        <h2 class="text-2xl font-semibold mb-6 text-storm-900 dark:text-storm-100">Project's Stories <span id="active-project-name" class="text-storm-500"></span></h2>
-
-        <form id="story-form" class="bg-white/40 dark:bg-storm-800/50 backdrop-blur-md p-6 rounded-xl shadow-lg border border-white/60 dark:border-storm-700 flex flex-col gap-4 mb-6 transition-colors">
-          <input type="hidden" id="story-id">
-          <input type="text" id="story-name" placeholder="Story title" required class="w-full p-3 rounded-lg border border-white/50 dark:border-storm-600 bg-white/50 dark:bg-storm-900/50 text-storm-800 dark:text-storm-300 focus:ring-2 focus:ring-storm-500 outline-none transition-all">
-          <textarea id="story-desc" placeholder="Story description" class="w-full p-3 rounded-lg border border-white/50 dark:border-storm-600 bg-white/50 dark:bg-storm-900/50 text-storm-800 dark:text-storm-300 focus:ring-2 focus:ring-storm-500 outline-none transition-all min-h-[80px]"></textarea>
-
-          <div class="form-row flex flex-col sm:flex-row gap-4 w-full">
-            <select id="story-priority" class="flex-1 p-3 rounded-lg border border-white/50 dark:border-storm-600 bg-white/50 dark:bg-storm-900/50 text-storm-800 dark:text-storm-300 focus:ring-2 focus:ring-storm-500 outline-none transition-all">
-              <option value="low">low priority</option>
-              <option value="medium" selected>medium priority</option>
-              <option value="high">high priority</option>
-            </select>
-            <select id="story-status" class="flex-1 p-3 rounded-lg border border-white/50 dark:border-storm-600 bg-white/50 dark:bg-storm-900/50 text-storm-800 dark:text-storm-300 focus:ring-2 focus:ring-storm-500 outline-none transition-all">
-              <option value="todo">to do</option>
-              <option value="doing">in progress</option>
-              <option value="done">done</option>
-            </select>
-          </div>
-          <button type="submit" id="save-story-btn" class="mt-2 w-full sm:w-auto self-start px-6 py-3 bg-storm-500 hover:bg-storm-500/90 dark:bg-storm-700 dark:hover:bg-storm-500 text-white font-medium rounded-lg transition-colors shadow-md">Add Story</button>
-        </form>
-
-        <div class="kanban-board flex flex-col md:flex-row gap-6 mt-8 items-start">
-          <div class="column flex-1 w-full bg-white/30 dark:bg-storm-900/40 backdrop-blur-md rounded-xl p-4 border border-white/50 dark:border-storm-700 min-h-[300px]" id="col-todo">
-            <h3 class="text-sm font-semibold text-storm-700 dark:text-storm-500 uppercase tracking-wider mb-4 pb-2 border-b border-white/50 dark:border-storm-700 flex justify-between">Need to be done <span>(0)</span></h3>
-            <div class="story-list flex flex-col gap-3"></div>
-          </div>
-          <div class="column flex-1 w-full bg-white/30 dark:bg-storm-900/40 backdrop-blur-md rounded-xl p-4 border border-white/50 dark:border-storm-700 min-h-[300px]" id="col-doing">
-            <h3 class="text-sm font-semibold text-storm-700 dark:text-storm-500 uppercase tracking-wider mb-4 pb-2 border-b border-white/50 dark:border-storm-700 flex justify-between">In progress <span>(0)</span></h3>
-            <div class="story-list flex flex-col gap-3"></div>
-          </div>
-          <div class="column flex-1 w-full bg-white/30 dark:bg-storm-900/40 backdrop-blur-md rounded-xl p-4 border border-white/50 dark:border-storm-700 min-h-[300px]" id="col-done">
-            <h3 class="text-sm font-semibold text-storm-700 dark:text-storm-500 uppercase tracking-wider mb-4 pb-2 border-b border-white/50 dark:border-storm-700 flex justify-between">Done <span>(0)</span></h3>
-            <div class="story-list flex flex-col gap-3"></div>
-          </div>
-        </div>
       </section>
 
-      <!-- СЕКЦИЯ ТАСОК -->
-      <section id="tasks-section" style="display: none;"> 
-        <hr class="border-t border-storm-300 dark:border-storm-700 my-8 opacity-50">
-        <h2 class="text-2xl font-semibold mb-6 text-storm-900 dark:text-storm-100">Tasks for Story <span id="active-story-name" class="text-storm-500"></span></h2>
-        
-        <button id="back-to-stories-btn" class="mb-6 px-4 py-2 bg-white/50 dark:bg-storm-800/80 backdrop-blur-md border border-white/60 dark:border-storm-700 rounded-lg hover:bg-white/80 dark:hover:bg-storm-700 transition-colors inline-block text-sm font-medium shadow-sm">← Back to Stories</button>
-
-        <form id="task-form" class="bg-white/40 dark:bg-storm-800/50 backdrop-blur-md p-6 rounded-xl shadow-lg border border-white/60 dark:border-storm-700 flex flex-col gap-4 mb-6 transition-colors">
-          <input type="hidden" id="task-id">
-          <input type="text" id="task-name" placeholder="Task name" required class="w-full p-3 rounded-lg border border-white/50 dark:border-storm-600 bg-white/50 dark:bg-storm-900/50 text-storm-800 dark:text-storm-300 focus:ring-2 focus:ring-storm-500 outline-none transition-all">
-          <textarea id="task-desc" placeholder="Task description" class="w-full p-3 rounded-lg border border-white/50 dark:border-storm-600 bg-white/50 dark:bg-storm-900/50 text-storm-800 dark:text-storm-300 focus:ring-2 focus:ring-storm-500 outline-none transition-all min-h-[80px]"></textarea>
-
-          <div class="form-row flex flex-col sm:flex-row gap-4 w-full">
-            <select id="task-priority" class="flex-1 p-3 rounded-lg border border-white/50 dark:border-storm-600 bg-white/50 dark:bg-storm-900/50 text-storm-800 dark:text-storm-300 focus:ring-2 focus:ring-storm-500 outline-none transition-all">
-              <option value="low">low priority</option>
-              <option value="medium" selected>medium priority</option>
-              <option value="high">high priority</option>
-            </select>
-            <input type="number" id="task-estimated-time" placeholder="Estimated hours" min="1" required class="flex-1 p-3 rounded-lg border border-white/50 dark:border-storm-600 bg-white/50 dark:bg-storm-900/50 text-storm-800 dark:text-storm-300 focus:ring-2 focus:ring-storm-500 outline-none transition-all">
-          </div>
-          <button type="submit" id="save-task-btn" class="mt-2 w-full sm:w-auto self-start px-6 py-3 bg-storm-500 hover:bg-storm-500/90 dark:bg-storm-700 dark:hover:bg-storm-500 text-white font-medium rounded-lg transition-colors shadow-md">Add Task</button>
-        </form>
-
-        <div class="kanban-board flex flex-col md:flex-row gap-6 mt-8 items-start">
-          <div class="column flex-1 w-full bg-white/30 dark:bg-storm-900/40 backdrop-blur-md rounded-xl p-4 border border-white/50 dark:border-storm-700 min-h-[300px]" id="task-col-todo">
-            <h3 class="text-sm font-semibold text-storm-700 dark:text-storm-500 uppercase tracking-wider mb-4 pb-2 border-b border-white/50 dark:border-storm-700 flex justify-between">To Do</h3>
-            <div class="task-list flex flex-col gap-3"></div>
-          </div>
-          <div class="column flex-1 w-full bg-white/30 dark:bg-storm-900/40 backdrop-blur-md rounded-xl p-4 border border-white/50 dark:border-storm-700 min-h-[300px]" id="task-col-doing">
-            <h3 class="text-sm font-semibold text-storm-700 dark:text-storm-500 uppercase tracking-wider mb-4 pb-2 border-b border-white/50 dark:border-storm-700 flex justify-between">In Progress</h3>
-            <div class="task-list flex flex-col gap-3"></div>
-          </div>
-          <div class="column flex-1 w-full bg-white/30 dark:bg-storm-900/40 backdrop-blur-md rounded-xl p-4 border border-white/50 dark:border-storm-700 min-h-[300px]" id="task-col-done">
-            <h3 class="text-sm font-semibold text-storm-700 dark:text-storm-500 uppercase tracking-wider mb-4 pb-2 border-b border-white/50 dark:border-storm-700 flex justify-between">Done</h3>
-            <div class="task-list flex flex-col gap-3"></div>
-          </div>
-        </div>
+      <!-- экран ожидания гостя -->
+      <section id="guest-screen" class="hidden max-w-md mx-auto bg-white/60 p-8 rounded-xl shadow-lg text-center border border-white/50">
+        <h2 class="text-2xl font-bold text-storm-900 mb-2">Oczekiwanie na zatwierdzenie konta</h2>
+        <p class="text-storm-600 mb-6">Twoje konto posiada status gościa. Poczekaj, aż administrator nada Ci uprawnienia.</p>
+        <button id="guest-logout-btn" class="px-4 py-2 bg-red-500/20 text-red-700 rounded-lg hover:bg-red-500/30">Logout</button>
       </section>
 
-      <!-- МОДАЛКА ДЕТАЛЕЙ ЗАДАЧИ -->
-      <dialog id="task-details-modal" class="backdrop:bg-black/60 bg-white/90 backdrop-blur-xl dark:bg-storm-800/90 p-6 rounded-xl shadow-2xl w-full max-w-md border border-white/50 dark:border-storm-700 text-storm-800 dark:text-storm-300">
-        <div class="modal-content">
-          <h3 id="modal-task-name" class="text-xl font-bold mb-2">Task Name</h3>
-          <p id="modal-task-desc" class="mb-6 text-sm text-storm-700 dark:text-storm-400">Description</p>
-          
-          <div class="task-meta space-y-2 text-sm">
-             <p><strong>Status:</strong> <span id="modal-task-status" class="ml-1"></span></p>
-             <p><strong>Est. Time:</strong> <span id="modal-task-est" class="ml-1"></span>h</p>
-             <p><strong>Start Date:</strong> <span id="modal-task-start" class="ml-1">-</span></p>
-             <p><strong>End Date:</strong> <span id="modal-task-end" class="ml-1">-</span></p>
-             <p><strong>Assignee:</strong> <span id="modal-task-assignee" class="ml-1 text-storm-700 dark:text-storm-400">Unassigned</span></p>
+      <!-- экран приложения для админ/девопс/дев -->
+      <section id="main-app" class="hidden">
+        <header class="mb-6 flex flex-wrap justify-between items-center gap-4">
+          <div class="flex items-center gap-4">
+            <div id="user-display" class="font-medium text-lg"></div>
+            <button id="notification-bell" class="relative p-2 rounded-lg bg-white/40 border border-white/50">
+              🔔 <span id="notification-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
+            </button>
           </div>
-          
-          <hr class="border-t border-storm-300 dark:border-storm-700 my-4 opacity-50">
+          <div class="flex gap-2">
+            <button id="manage-users-btn" class="hidden px-4 py-2 bg-white/50 border border-white/50 rounded-lg hover:bg-white/80 font-medium">Manage Users</button>
+            <button id="logout-btn" class="px-4 py-2 bg-red-500/20 text-red-700 border border-red-500/30 rounded-lg hover:bg-red-500/30 font-medium">Logout</button>
+          </div>
+        </header>
 
+        <!-- панель админа (управление пользователями) -->
+        <div id="admin-users-panel" class="hidden bg-white/60 p-6 rounded-xl shadow-lg border border-white/50 mb-8">
+          <h2 class="text-xl font-bold mb-4">Users Management</h2>
+          <div id="users-list-container" class="flex flex-col gap-3"></div>
+        </div>
+
+        <form id="project-form" class="bg-white/40 p-6 rounded-xl shadow-lg border border-white/60 flex flex-col gap-4 mb-6">
+          <input type="hidden" id="project-id">
+          <input type="text" id="project-name" placeholder="Project name" required class="p-3 rounded-lg border outline-none">
+          <textarea id="project-desc" placeholder="Project description" class="p-3 rounded-lg border outline-none"></textarea>
+          <button type="submit" id="submit-btn" class="w-full sm:w-auto self-start px-6 py-3 bg-storm-500 text-white rounded-lg">Save Project</button>
+        </form>
+
+        <h2 class="text-2xl font-semibold mb-6">Project list</h2>
+        <div id="project-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+        <section id="stories-section" class="hidden mt-8"> 
+          <h2 class="text-2xl font-semibold mb-6">Project's Stories</h2>
+          <form id="story-form" class="bg-white/40 p-6 rounded-xl shadow-lg flex flex-col gap-4 mb-6">
+            <input type="hidden" id="story-id">
+            <input type="text" id="story-name" placeholder="Story title" required class="p-3 rounded-lg outline-none">
+            <textarea id="story-desc" placeholder="Story description" class="p-3 rounded-lg outline-none"></textarea>
+            <div class="flex gap-4">
+              <select id="story-priority" class="flex-1 p-3 rounded-lg outline-none"><option value="low">low</option><option value="medium" selected>medium</option><option value="high">high</option></select>
+              <select id="story-status" class="flex-1 p-3 rounded-lg outline-none"><option value="todo">to do</option><option value="doing">doing</option><option value="done">done</option></select>
+            </div>
+            <button type="submit" id="save-story-btn" class="w-full sm:w-auto self-start px-6 py-3 bg-storm-500 text-white rounded-lg">Add Story</button>
+          </form>
+          <div class="flex flex-col md:flex-row gap-6 items-start">
+            <div class="flex-1 w-full bg-white/30 p-4 min-h-[300px]" id="col-todo"><h3 class="font-semibold mb-4">To Do</h3><div class="story-list flex flex-col gap-3"></div></div>
+            <div class="flex-1 w-full bg-white/30 p-4 min-h-[300px]" id="col-doing"><h3 class="font-semibold mb-4">Doing</h3><div class="story-list flex flex-col gap-3"></div></div>
+            <div class="flex-1 w-full bg-white/30 p-4 min-h-[300px]" id="col-done"><h3 class="font-semibold mb-4">Done</h3><div class="story-list flex flex-col gap-3"></div></div>
+          </div>
+        </section>
+
+        <section id="tasks-section" class="hidden mt-8"> 
+          <h2 class="text-2xl font-semibold mb-6">Tasks</h2>
+          <button id="back-to-stories-btn" class="mb-6 px-4 py-2 bg-white/50 border rounded-lg">← Back to Stories</button>
+          <form id="task-form" class="bg-white/40 p-6 rounded-xl shadow-lg flex flex-col gap-4 mb-6">
+            <input type="hidden" id="task-id">
+            <input type="text" id="task-name" placeholder="Task name" required class="p-3 rounded-lg outline-none">
+            <div class="flex gap-4">
+              <select id="task-priority" class="flex-1 p-3 rounded-lg outline-none"><option value="low">low</option><option value="medium" selected>medium</option><option value="high">high</option></select>
+              <input type="number" id="task-estimated-time" placeholder="Hours" required class="flex-1 p-3 rounded-lg outline-none">
+            </div>
+            <button type="submit" id="save-task-btn" class="w-full sm:w-auto self-start px-6 py-3 bg-storm-500 text-white rounded-lg">Add Task</button>
+          </form>
+          <div class="flex flex-col md:flex-row gap-6 items-start">
+            <div class="flex-1 w-full bg-white/30 p-4 min-h-[300px]" id="task-col-todo"><h3 class="font-semibold mb-4">To Do</h3><div class="task-list flex flex-col gap-3"></div></div>
+            <div class="flex-1 w-full bg-white/30 p-4 min-h-[300px]" id="task-col-doing"><h3 class="font-semibold mb-4">In Progress</h3><div class="task-list flex flex-col gap-3"></div></div>
+            <div class="flex-1 w-full bg-white/30 p-4 min-h-[300px]" id="task-col-done"><h3 class="font-semibold mb-4">Done</h3><div class="task-list flex flex-col gap-3"></div></div>
+          </div>
+        </section>
+
+        <!-- модалки -->
+        <dialog id="task-details-modal" class="p-6 rounded-xl shadow-2xl w-full max-w-md bg-white/90">
+          <h3 id="modal-task-name" class="text-xl font-bold mb-2"></h3>
+          <p id="modal-task-status" class="mb-4"></p>
           <div id="assign-section" class="flex gap-3 mt-4">
-              <select id="assign-user-select" class="flex-1 p-2 rounded-lg border border-white/50 dark:border-storm-600 bg-white/50 dark:bg-storm-900/50 text-sm">
-              </select>
-              <button id="assign-user-btn" class="px-4 py-2 bg-storm-500 dark:bg-storm-700 text-white rounded-lg hover:bg-storm-500/90 text-sm font-medium transition-colors shadow-sm">Assign & Start</button>
+              <select id="assign-user-select" class="flex-1 p-2 border rounded-lg"></select>
+              <button id="assign-user-btn" class="px-4 py-2 bg-storm-500 text-white rounded-lg">Assign</button>
           </div>
+          <button id="mark-done-btn" class="hidden mt-4 w-full px-4 py-2 bg-green-500/20 text-green-700 rounded-lg">Mark Done</button>
+          <div class="mt-6 flex justify-end"><button id="close-modal-btn" class="px-4 py-2 border rounded-lg">Close</button></div>
+        </dialog>
 
-          <div id="done-section" style="display: none;" class="mt-4">
-              <button id="mark-done-btn" class="w-full px-4 py-2 bg-green-500/20 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-lg hover:bg-green-500/30 text-sm font-medium transition-colors shadow-sm">Mark as Done</button>
-          </div>
+        <dialog id="all-notif-modal" class="p-6 rounded-xl shadow-2xl w-full max-w-lg bg-white/90">
+          <h3 class="text-xl font-bold mb-4">Notifications</h3>
+          <div id="notif-list" class="flex flex-col gap-3 max-h-[60vh] overflow-y-auto"></div>
+          <button id="close-notif-modal-btn" class="mt-4 px-4 py-2 border rounded-lg">Close</button>
+        </dialog>
 
-          <div class="mt-6 flex justify-end">
-            <button id="close-modal-btn" class="px-4 py-2 bg-white/50 dark:bg-storm-900 border border-white/50 dark:border-storm-700 rounded-lg hover:bg-white/80 dark:hover:bg-storm-700 text-sm font-medium transition-colors shadow-sm">Close</button>
-          </div>
-        </div>
-      </dialog>
-
-      <!-- МОДАЛКА: СПИСОК ВСЕХ УВЕДОМЛЕНИЙ -->
-      <dialog id="all-notif-modal" class="backdrop:bg-black/60 bg-white/90 backdrop-blur-xl dark:bg-storm-800/90 p-6 rounded-xl shadow-2xl w-full max-w-lg border border-white/50 dark:border-storm-700 text-storm-800 dark:text-storm-300">
-        <h3 class="text-xl font-bold mb-4">Your Notifications</h3>
-        <div id="notif-list" class="flex flex-col gap-3 max-h-[60vh] overflow-y-auto pr-2">
-          <!-- сюда скрипт вставит карточки писем -->
-        </div>
-        <div class="mt-6 flex justify-end">
-          <button id="close-notif-modal-btn" class="px-4 py-2 bg-white/50 dark:bg-storm-900 border border-white/50 dark:border-storm-700 rounded-lg shadow-sm text-sm hover:bg-white/80 transition-colors">Close</button>
-        </div>
-      </dialog>
-
-      <!-- МОДАЛКА: СРОЧНОЕ ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ (HIGH/MEDIUM) -->
-      <dialog id="live-alert-modal" class="backdrop:bg-black/20 bg-white/95 backdrop-blur-xl dark:bg-storm-800/95 p-5 rounded-xl shadow-2xl w-full max-w-sm border-l-4 border-l-storm-500 border border-white/50 dark:border-storm-700 text-storm-800 dark:text-storm-300 fixed bottom-4 right-4 m-0 ml-auto mr-4">
-        <h3 id="live-alert-title" class="font-bold text-md text-storm-900 dark:text-storm-100">New Alert!</h3>
-        <p id="live-alert-desc" class="text-sm mt-1 text-storm-700 dark:text-storm-400"></p>
-        <button id="close-live-alert-btn" class="mt-3 px-3 py-1.5 bg-storm-100 dark:bg-storm-700 rounded-lg text-xs font-medium w-full hover:bg-storm-300 transition-colors">Got it</button>
-      </dialog>
+        <dialog id="live-alert-modal" class="p-5 rounded-xl shadow-2xl max-w-sm fixed bottom-4 right-4 bg-white/95 border-l-4 border-storm-500">
+          <h3 id="live-alert-title" class="font-bold"></h3>
+          <p id="live-alert-desc" class="text-sm mt-1"></p>
+          <button id="close-live-alert-btn" class="mt-3 px-3 py-1.5 bg-gray-200 rounded-lg w-full">Got it</button>
+        </dialog>
+      </section>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

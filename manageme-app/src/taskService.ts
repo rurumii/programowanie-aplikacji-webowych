@@ -22,7 +22,7 @@ export class TaskService {
         return allTasks.filter(t=>t.storyId===storyId);
     }
 
-    /*(save - создание задачи):
+    /* save - создание задачи
      * 1. как и в проектах, мы проверяем isnew.
      * 2. системный момент: в самой задаче (task) нет поля "кто владелец". 
      * там есть только storyid. поэтому, чтобы узнать, кому слать письмо, 
@@ -49,7 +49,7 @@ export class TaskService {
     }
 
     /*
-     * (delete - удаление)
+     * delete
      * почему мы сначала получаем задачу (gettaskbyid), а только потом удаляем?
      * если мы сначала удалим ее из базы, мы потеряем её данные (имя и storyid).
      * а без storyid мы не сможем найти историю и понять, кому отправлять уведомление.
@@ -75,7 +75,7 @@ export class TaskService {
     }
 
     /*
-     * (смена статуса на doing)
+     * смена статуса на doing
      * тут срабатывают сразу 2 уведомления:
      * 1. исполнителю (recipient: userid) - priority high (ты назначен на задачу)
      * 2. владельцу истории (recipient: ownerid) - priority low (задачу начали делать)
@@ -116,10 +116,10 @@ export class TaskService {
     }
 
     /*
-     * (смена статуса на done):
-     * алгоритм такой же, как при assignuser.
+     * смена статуса на done
+     * алгоритм такой же, как при assignuser
      * только тут статус становится 'done', а значит по заданию 
-     * приоритет уведомления для владельца истории меняется на 'medium'.
+     * приоритет уведомления для владельца истории меняется на 'medium'
      */
     async markAsDone(taskId:string): Promise<void> {
         const task = await this.getTaskById(taskId);

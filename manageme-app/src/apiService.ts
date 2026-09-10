@@ -1,61 +1,49 @@
-export class ApiClient{
-    // мок задержки для имитации работы сети
-    private emulateNetworkDelay(): Promise<void>{
-        return new Promise(resolve=> setTimeout(resolve,300));
-    }
+import { appConfig } from './config';
+import { db } from './firebaseSetup';
+import { collection, doc, getDocs, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 
-    //getall
-    // T - generic
-    async get<T>(endpointKey: string): Promise<T[]>{
-        await this.emulateNetworkDelay(); // ждём имитируя сеть
-
-        const data = localStorage.getItem(endpointKey);
-        return data ? JSON.parse(data): [];
-    }
-
-    //getbyid
-    async getById<T extends {id:string}>(endpointKey:string, id:string):Promise<T | undefined>{
-        await this.emulateNetworkDelay();
-
-        const data = localStorage.getItem(endpointKey);
-        if (!data) return undefined;
-
-        const items:T[] = JSON.parse(data);
-        return items.find((item:T)=> item.id===id);
-    }
-
-
-    // save/update
-    // мы требуем чтобы у сохраняемого объекта было поле айди
-    async save<T extends {id: string}>(endpointKey: string,item: T): Promise<void> {
-        await this.emulateNetworkDelay();
-
-        // получаем текущие данные
-        const data = localStorage.getItem(endpointKey);
-        const items: T[] = data ? JSON.parse(data): [];
-
-        // ищем есть ли уже такой элемент
-        const index = items.findIndex(i=>i.id === item.id);
-        if (index > -1){
-            items[index] = item; // update
+export class ApiClient {
+    async save<T extends {id: string}>(endpointKey: string, item: T): Promise<void> {
+        if (appConfig.storageSystem === 'firebase') {
+            // firestore не любит поля undefined, поэтому очищаем объект через JSON
+            const cleanItem = JSON.parse(JSON.stringify(item));
+            await setDoc(doc(db, endpointKey, item.id), cleanItem);
         } else {
-            items.push(item); // add new
+            const data = await this.get<T>(endpointKey);
+            const index = data.findIndex(i => i.id === item.id);
+            if (index >= 0) data[index] = item;
+            else data.push(item);
+            localStorage.setItem(endpointKey, JSON.stringify(data));
         }
-
-        localStorage.setItem(endpointKey, JSON.stringify(items));
     }
 
-    //delete
-    async delete(endpointKey:string,id: string): Promise<void>{
-        await this.emulateNetworkDelay();
+    async get<T>(endpointKey: string): Promise<T[]> {
+        if (appConfig.storageSystem === 'firebase') {
+            const querySnapshot = await getDocs(collection(db, endpointKey));
+            return querySnapshot.docs.map(doc => doc.data() as T);
+        } else {
+            const data = localStorage.getItem(endpointKey);
+            return data ? JSON.parse(data) : [];
+        }
+    }
 
-        const data = localStorage.getItem(endpointKey);
-        if (!data) return;
+    async getById<T extends {id: string}>(endpointKey: string, id: string): Promise<T | undefined> {
+        if (appConfig.storageSystem === 'firebase') {
+            const docSnap = await getDoc(doc(db, endpointKey, id));
+            return docSnap.exists() ? docSnap.data() as T : undefined;
+        } else {
+            const data = await this.get<T>(endpointKey);
+            return data.find(i => i.id === id);
+        }
+    }
 
-        const items = JSON.parse(data);
-        // filter
-        const filteredItems = items.filter((item:any)=>item.id!== id);
-
-        localStorage.setItem(endpointKey, JSON.stringify(filteredItems));
+    async delete(endpointKey: string, id: string): Promise<void> {
+        if (appConfig.storageSystem === 'firebase') {
+            await deleteDoc(doc(db, endpointKey, id));
+        } else {
+            const data = await this.get<{id: string}>(endpointKey);
+            const filtered = data.filter(i => i.id !== id);
+            localStorage.setItem(endpointKey, JSON.stringify(filtered));
+        }
     }
 }

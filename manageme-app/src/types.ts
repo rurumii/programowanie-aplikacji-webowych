@@ -5,16 +5,18 @@ export interface Project {
     description: string;
 }
 
-// наши кастомные типы (union types)
+// кастомные типы (union types)
 export type Priority = 'low' | 'medium' | 'high';
 export type Status = 'todo' | 'doing' | 'done';
-export type Role = 'admin' | 'devops' | 'developer';
+export type Role = 'admin' | 'devops' | 'developer' | 'guest';
 
 export interface User {
     id: string;
     name: string;
     surname: string;
+    email: string;
     role: Role;
+    isBlocked: boolean;
 }
 
 // описание конкретной функции или задачи которую нужно реализовать в проекте
@@ -58,7 +60,7 @@ export type Notification = {
     title: string;
     message: string;
     date: ISOString;
-    priority: Priority; // В методичке опечатка 'prority', используем наш тип Priority
+    priority: Priority; 
     isRead: boolean;
     recipientId: UserID;
 }
