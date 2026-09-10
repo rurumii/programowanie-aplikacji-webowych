@@ -44,3 +44,21 @@ export interface Task {
     assigneeId?: string; // айди девопса/дева
     
 }
+
+export type ISOString = string;
+export type UserID = string;
+/*
+ * почему добавили id, которого нет в задании
+ * потому что мой класс apiclient имеет жесткое ограничение: 
+ * метод save принимает только те объекты, у которых есть id (<t extends {id: string}>). 
+ * без поля id typescript просто не позволил бы сохранить уведомление в базу.
+ */
+export type Notification = {
+    id: string; 
+    title: string;
+    message: string;
+    date: ISOString;
+    priority: Priority; // В методичке опечатка 'prority', используем наш тип Priority
+    isRead: boolean;
+    recipientId: UserID;
+}

@@ -4,11 +4,13 @@ import { UserService } from './userService';
 import { StoryService } from './storyService';
 import type { Project, Story, Priority, Status, Task } from './types';
 import { TaskService } from './taskService';
+import { NotificationService } from './notificationService';
 
 const service = new ProjectService();
 const userService = new UserService();
 const storyService = new StoryService();
 const taskService = new TaskService();
+const notificationService = new NotificationService();
 
 const form = document.querySelector<HTMLFormElement>('#project-form')!;
 const listContainer = document.querySelector<HTMLFormElement>('#project-list')!;
@@ -33,10 +35,24 @@ const assignSelect = document.querySelector<HTMLSelectElement>('#assign-user-sel
 const assignBtn = document.querySelector<HTMLButtonElement>('#assign-user-btn')!;
 const markDoneBtn = document.querySelector<HTMLButtonElement>('#mark-done-btn')!;
 
+// DOM элементы для уведомлений
+const notifBell = document.querySelector<HTMLButtonElement>('#notification-bell')!;
+const notifCount = document.querySelector<HTMLSpanElement>('#notification-count')!;
+const allNotifModal = document.querySelector<HTMLDialogElement>('#all-notif-modal')!;
+const closeNotifModalBtn = document.querySelector<HTMLButtonElement>('#close-notif-modal-btn')!;
+const notifList = document.querySelector<HTMLDivElement>('#notif-list')!;
+
+const liveAlertModal = document.querySelector<HTMLDialogElement>('#live-alert-modal')!;
+const closeLiveAlertBtn = document.querySelector<HTMLButtonElement>('#close-live-alert-btn')!;
+
 async function init() {
   await renderUserInfo();
   await renderProjects();
   await renderStories(); 
+  
+  // Инициализация уведомлений при загрузке страницы
+  await renderNotifications();
+  setupLiveAlerts();
 }
 
 async function renderProjects(){
@@ -73,7 +89,7 @@ async function renderUserInfo() {
   }
 }
 
-form.addEventListener('submit', (e) =>{
+form.addEventListener('submit', async (e) =>{
   e.preventDefault(); 
   const projectData: Project = {
     id: idInput.value || crypto.randomUUID(),
@@ -81,7 +97,7 @@ form.addEventListener('submit', (e) =>{
     description: descInput.value
   };
 
-  service.save(projectData);
+  await service.save(projectData);
   form.reset(); 
   idInput.value=''; 
   renderProjects();  
@@ -99,9 +115,9 @@ listContainer.addEventListener('click', async (e) => {
   }
 
   if (target.classList.contains('delete-btn')) {
-    service.delete(id);
+    await service.delete(id);
     renderProjects();
-    renderStories(); // обновляем истории при удалении проекта
+    renderStories(); 
   }
 
   if (target.classList.contains('edit-btn')){
@@ -135,7 +151,7 @@ storyForm.addEventListener('submit', async (e) => {
     createdAt: new Date().toISOString()
   };
 
-  storyService.save(newStory);
+  await storyService.save(newStory);
   storyForm.reset();
   renderStories(); 
   (document.querySelector('#story-id') as HTMLInputElement).value='';
@@ -146,13 +162,12 @@ async function renderStories(){
   const activeId = storyService.getActiveProjectId();
   const section = document.querySelector<HTMLElement>('#stories-section')!;
 
-  // проверяем, существует ли проект в базе
   const projectExists = activeId ? await service.getById(activeId) : null;
 
   if (!activeId || !projectExists){
     section.style.display = 'none';
     if (!projectExists && activeId) {
-      storyService.setActiveProject(''); // очищаем битый ID из localStorage
+      storyService.setActiveProject(''); 
     }
     return;
   }
@@ -355,23 +370,7 @@ closeModalBtn.addEventListener('click', () => {
 
 assignBtn.addEventListener('click', async () => {
   if (!currentlyOpenTaskId) return;
-  
-  const task = await taskService.getTaskById(currentlyOpenTaskId);
-  if (task) {
-    task.assigneeId = assignSelect.value;
-    task.status = 'doing';
-    task.startDate = new Date().toISOString();
-    
-    await taskService.save(task); 
-    
-    if (activeStoryId) {
-      const story = await storyService.getStoryById(activeStoryId);
-      if (story && story.status === 'todo') {
-        story.status = 'doing';
-        await storyService.save(story); 
-      }
-    }
-  }
+  await taskService.assignUser(currentlyOpenTaskId, assignSelect.value);
   
   modal.close();
   renderTasks();
@@ -380,30 +379,85 @@ assignBtn.addEventListener('click', async () => {
 
 markDoneBtn.addEventListener('click', async () => {
   if (!currentlyOpenTaskId) return;
-  
-  const task = await taskService.getTaskById(currentlyOpenTaskId);
-  if (task) {
-    task.status = 'done';
-    task.endDate = new Date().toISOString();
-    await taskService.save(task); 
-    
-    if (activeStoryId) {
-      const allTasks = await taskService.getTasksByStory(activeStoryId);
-      const allDone = allTasks.every(t => t.status === 'done');
-      
-      if (allDone) {
-        const story = await storyService.getStoryById(activeStoryId);
-        if (story) {
-          story.status = 'done';
-          await storyService.save(story);
-        }
-      }
-    }
-  }
+  await taskService.markAsDone(currentlyOpenTaskId);
   
   modal.close();
   renderTasks();
   renderStories(); 
+});
+
+
+/*
+ * ui уведомления
+ * 1. rendernotifications():
+ * берет текущего пользователя, запрашивает все ЕГО письма.
+ * считает непрочитанные (filter isread == false) и обновляет красный счетчик на колокольчике.
+ * затем генерирует карточки писем внутри большой модалки.
+ * 
+ * 2. setuplivealerts() (подписка):
+ * мы передаем эту функцию внутрь notificationservice.
+ * каждый раз, когда кто-то создает уведомление 'high' или 'medium',
+ * сервис автоматически вызывает эту функцию. она берет текст письма
+ * и сразу показывает всплывающее окно в правом нижнем углу.
+ */
+async function renderNotifications() {
+  const user = await userService.getCurrentUser();
+  const notifs = await notificationService.getForUser(user.id);
+
+  const unread = notifs.filter(n => !n.isRead);
+  if (unread.length > 0) {
+      notifCount.textContent = unread.length.toString();
+      notifCount.classList.remove('hidden');
+  } else {
+      notifCount.classList.add('hidden');
+  }
+
+  notifList.innerHTML = notifs.map(n => `
+      <div class="p-4 border rounded-lg ${n.isRead ? 'bg-white/20 dark:bg-storm-800/30 opacity-70' : 'bg-white/80 dark:bg-storm-700/80 font-medium'} dark:border-storm-600 flex justify-between items-center transition-all">
+          <div>
+              <span class="text-xs text-storm-500 uppercase tracking-wide font-bold">${n.priority} Priority • ${new Date(n.date).toLocaleDateString()}</span>
+              <h4 class="text-md mt-1 text-storm-900 dark:text-storm-100">${n.title}</h4>
+              <p class="text-sm mt-1 text-storm-700 dark:text-storm-400">${n.message}</p>
+          </div>
+          ${!n.isRead ? `<button class="mark-read-btn ml-4 px-3 py-1.5 bg-storm-100 border border-storm-300 dark:bg-storm-600 dark:border-storm-500 dark:text-storm-100 text-storm-800 rounded-lg text-xs font-medium hover:bg-storm-300 transition-colors shadow-sm whitespace-nowrap" data-id="${n.id}">Mark Read</button>` : ''}
+      </div>
+  `).join('');
+}
+
+// открытие списка уведомлений
+notifBell.addEventListener('click', () => {
+  allNotifModal.showModal();
+});
+
+// закрытие списка уведомлений
+closeNotifModalBtn.addEventListener('click', () => {
+  allNotifModal.close();
+});
+
+// клик по кнопке "Mark Read" внутри списка уведомлений
+notifList.addEventListener('click', async (e) => {
+  const target = e.target as HTMLElement;
+  if (target.classList.contains('mark-read-btn')) {
+      const id = target.getAttribute('data-id');
+      if (id) {
+          await notificationService.markAsRead(id);
+          await renderNotifications();
+      }
+  }
+});
+
+// настройка подписки на срочные всплывающие окна
+function setupLiveAlerts() {
+  notificationService.subscribe(async (n) => {
+      document.getElementById('live-alert-title')!.textContent = n.title;
+      document.getElementById('live-alert-desc')!.textContent = n.message;
+      liveAlertModal.showModal();
+      await renderNotifications(); // обновляем красный счетчик на колокольчике
+  });
+}
+
+closeLiveAlertBtn.addEventListener('click', () => {
+  liveAlertModal.close();
 });
 
 function setupThemeToggle() {

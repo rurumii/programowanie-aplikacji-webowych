@@ -12,9 +12,17 @@
       <h1 class="text-3xl font-bold text-center mb-8 tracking-wide">Manage me</h1>
       
       <header id="app-header" class="mb-6 flex justify-between items-center">
-        <div id="user-display" class="font-medium text-lg"></div>
+        <!-- БЛОК ПОЛЬЗОВАТЕЛЯ И УВЕДОМЛЕНИЙ -->
+        <div class="flex items-center gap-4">
+          <div id="user-display" class="font-medium text-lg"></div>
+          
+          <button id="notification-bell" class="relative p-2 rounded-lg bg-white/40 dark:bg-storm-800/50 backdrop-blur-md hover:bg-white/60 transition-colors border border-white/50" aria-label="Notifications">
+            🔔 
+            <span id="notification-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden shadow-sm">0</span>
+          </button>
+        </div>
         
-        <button id="theme-toggle" class="p-2 rounded-lg bg-storm-500 text-white hover:bg-storm-500/80 dark:bg-storm-700 dark:text-storm-300 dark:hover:bg-storm-500 transition-colors" aria-label="Toggle Dark Mode">
+        <button id="theme-toggle" class="p-2 rounded-lg bg-storm-500 text-white hover:bg-storm-500/80 dark:bg-storm-700 dark:text-storm-300 dark:hover:bg-storm-500 transition-colors shadow-sm" aria-label="Toggle Dark Mode">
           <svg class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
           </svg>
@@ -24,6 +32,7 @@
         </button>
       </header>
 
+      <!-- ФОРМА ПРОЕКТОВ -->
       <form id="project-form" class="bg-white/40 dark:bg-storm-800/50 backdrop-blur-md p-6 rounded-xl shadow-lg border border-white/60 dark:border-storm-700 flex flex-col gap-4 mb-6 transition-colors">
         <input type="hidden" id="project-id">
         <input type="text" id="project-name" placeholder="Project name" required class="w-full p-3 rounded-lg border border-white/50 dark:border-storm-600 bg-white/50 dark:bg-storm-900/50 text-storm-800 dark:text-storm-300 focus:ring-2 focus:ring-storm-500 outline-none transition-all">
@@ -36,6 +45,7 @@
       <h2 class="text-2xl font-semibold mb-6 text-storm-900 dark:text-storm-100">Project list</h2>
       <div id="project-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
+      <!-- СЕКЦИЯ СТОРЕЙ -->
       <section id="stories-section" style="display: none;"> 
         <hr class="border-t border-storm-300 dark:border-storm-700 my-8 opacity-50">
         <h2 class="text-2xl font-semibold mb-6 text-storm-900 dark:text-storm-100">Project's Stories <span id="active-project-name" class="text-storm-500"></span></h2>
@@ -76,6 +86,7 @@
         </div>
       </section>
 
+      <!-- СЕКЦИЯ ТАСОК -->
       <section id="tasks-section" style="display: none;"> 
         <hr class="border-t border-storm-300 dark:border-storm-700 my-8 opacity-50">
         <h2 class="text-2xl font-semibold mb-6 text-storm-900 dark:text-storm-100">Tasks for Story <span id="active-story-name" class="text-storm-500"></span></h2>
@@ -114,6 +125,7 @@
         </div>
       </section>
 
+      <!-- МОДАЛКА ДЕТАЛЕЙ ЗАДАЧИ -->
       <dialog id="task-details-modal" class="backdrop:bg-black/60 bg-white/90 backdrop-blur-xl dark:bg-storm-800/90 p-6 rounded-xl shadow-2xl w-full max-w-md border border-white/50 dark:border-storm-700 text-storm-800 dark:text-storm-300">
         <div class="modal-content">
           <h3 id="modal-task-name" class="text-xl font-bold mb-2">Task Name</h3>
@@ -143,6 +155,24 @@
             <button id="close-modal-btn" class="px-4 py-2 bg-white/50 dark:bg-storm-900 border border-white/50 dark:border-storm-700 rounded-lg hover:bg-white/80 dark:hover:bg-storm-700 text-sm font-medium transition-colors shadow-sm">Close</button>
           </div>
         </div>
+      </dialog>
+
+      <!-- МОДАЛКА: СПИСОК ВСЕХ УВЕДОМЛЕНИЙ -->
+      <dialog id="all-notif-modal" class="backdrop:bg-black/60 bg-white/90 backdrop-blur-xl dark:bg-storm-800/90 p-6 rounded-xl shadow-2xl w-full max-w-lg border border-white/50 dark:border-storm-700 text-storm-800 dark:text-storm-300">
+        <h3 class="text-xl font-bold mb-4">Your Notifications</h3>
+        <div id="notif-list" class="flex flex-col gap-3 max-h-[60vh] overflow-y-auto pr-2">
+          <!-- сюда скрипт вставит карточки писем -->
+        </div>
+        <div class="mt-6 flex justify-end">
+          <button id="close-notif-modal-btn" class="px-4 py-2 bg-white/50 dark:bg-storm-900 border border-white/50 dark:border-storm-700 rounded-lg shadow-sm text-sm hover:bg-white/80 transition-colors">Close</button>
+        </div>
+      </dialog>
+
+      <!-- МОДАЛКА: СРОЧНОЕ ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ (HIGH/MEDIUM) -->
+      <dialog id="live-alert-modal" class="backdrop:bg-black/20 bg-white/95 backdrop-blur-xl dark:bg-storm-800/95 p-5 rounded-xl shadow-2xl w-full max-w-sm border-l-4 border-l-storm-500 border border-white/50 dark:border-storm-700 text-storm-800 dark:text-storm-300 fixed bottom-4 right-4 m-0 ml-auto mr-4">
+        <h3 id="live-alert-title" class="font-bold text-md text-storm-900 dark:text-storm-100">New Alert!</h3>
+        <p id="live-alert-desc" class="text-sm mt-1 text-storm-700 dark:text-storm-400"></p>
+        <button id="close-live-alert-btn" class="mt-3 px-3 py-1.5 bg-storm-100 dark:bg-storm-700 rounded-lg text-xs font-medium w-full hover:bg-storm-300 transition-colors">Got it</button>
       </dialog>
     </div>
     <script type="module" src="/src/main.ts"></script>

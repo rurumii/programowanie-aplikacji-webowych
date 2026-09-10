@@ -1,48 +1,64 @@
 import type { Project } from "./types";
 import { ApiClient } from './apiService';
+import { NotificationService } from './notificationService';
+import { UserService } from './userService';
 
+
+/*
+     * 1. внедрение зависимостей (dependency injection): 
+     * сам projectservice умеет только сохранять данные. чтобы рассылать уведомления, 
+     * мы передали ему "помощников": userservice (чтобы найти всех админов) 
+     * и notificationservice (чтобы отправить им готовый текст).
+     * 
+     * 2. зачем нужна переменная isnew:
+     * кнопка "save" и метод save() универсальны: они делают и create (создание), 
+     * и update (редактирование). если не проверить старую базу (isnew = !existingproject), 
+     * то при каждом редактировании текста проекта админам летел бы спам 
+     * "создан новый проект!". уведомление уходит только если проекта раньше не было.
+*/
 export class ProjectService {
     private api = new ApiClient();
     private readonly endpoint = 'manageme-projects';
+    
+    // создаем экземпляры сервисов, чтобы к ним обращаться
+    private notificationService = new NotificationService();
+    private userService = new UserService();
 
-    // ключ по которому будут искаться данные в браузере
-    // private readonly storageKey = "projects";
-
-    // метод для получения всех проектов
     async getAll(): Promise<Project[]> {
         return await this.api.get<Project>(this.endpoint);
     }
 
-    // сохранение (криейт/апдейт)
     async save(project: Project) : Promise<void> {
-        await this.api.save<Project>(this.endpoint,project);
-        // // получение всех
-        // const projects = this.getAll();
-        // // ищем айди параметра в массиве всех проектов
-        // const index = projects.findIndex(p => p.id === project.id);
+        // проверяем, существует ли проект в базе до сохранения
+        const existingProject = await this.getById(project.id);
+        const isNew = !existingProject;
 
-        // if (index !== -1){
-        //     // если проект с таким айди существует => заменяем (апдейт);
-        //     // если нет - добавляем в массив
-        //     projects[index] = project;
-        // } else {
-        //     projects.push(project);
-        // }
+        // сохраняем проект (эта строка уже была)
+        await this.api.save<Project>(this.endpoint, project);
 
-        // // сохранение в лс в виде строки
-        // localStorage.setItem(this.storageKey, JSON.stringify(projects));
+        // ТРИГГЕР УВЕДОМЛЕНИЯ: срабатывает только если проект новый
+        if (isNew) {
+            // берем всех юзеров и фильтруем только админов
+            const allUsers = await this.userService.getAllUsers();
+            const admins = allUsers.filter(u => u.role === 'admin');
+
+            // рассылаем каждому админу уведомление (High priority)
+            for (const admin of admins) {
+                await this.notificationService.create(
+                    'New Project Created',
+                    `Utworzono nowy projekt: ${project.name}`,
+                    'high',
+                    admin.id
+                );
+            }
+        }
     }
 
-    // удаление (оставляем в массиве всё кроме проекта с указанным айди)
     async delete(id: string) : Promise<void> {
-        await this.api.delete(this.endpoint,id);
-        // // фильтр переписывает, создаёт новый массив оставляя все элементы которые не равны айди в парамертеп
-        // const projects = this.getAll().filter(p=> p.id !== id);
-        // localStorage.setItem(this.storageKey, JSON.stringify(projects));
+        await this.api.delete(this.endpoint, id);
     }
 
-    // поиск; достаточно только айди в параметре 
     async getById(id: string): Promise<Project | undefined>{
-        return await this.api.getById<Project>(this.endpoint,id);
+        return await this.api.getById<Project>(this.endpoint, id);
     }
 }
