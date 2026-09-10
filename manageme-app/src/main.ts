@@ -55,6 +55,19 @@ const notifList = document.querySelector<HTMLDivElement>('#notif-list')!;
 const liveAlertModal = document.querySelector<HTMLDialogElement>('#live-alert-modal')!;
 const closeLiveAlertBtn = document.querySelector<HTMLButtonElement>('#close-live-alert-btn')!;
 
+
+/*
+ * rbac - role-based access control
+ * 
+ * 1. как работает блокировка: мы не удаляем юзеров из базы, 
+ * мы ставим им флаг isblocked: true. checkauthandinit видит этот флаг 
+ * и сразу делает logout()
+ * 
+ * 2. изоляция интерфейса: html разделен на секции (login, guest, main). 
+ * по умолчанию все скрыты классом hidden. скрипт анализирует роль (user.role) 
+ * и показывает только разрешенную секцию. если роль 'admin', дополнительно 
+ * открывается кнопка manageusersbtnnpm init playwright@latest
+ */
 // логика маршрутизации (авторизация)
 async function checkAuthAndInit() {
     const user = await userService.getCurrentUser();
@@ -419,10 +432,13 @@ taskForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!activeStoryId) return;
 
+    // bezpieczne pobieranie opisu (jeśli pola nie ma, wstawia pusty string)
+    const descInput = document.querySelector('#task-desc') as HTMLTextAreaElement;
+    
     const newTask: Task = {
         id: (document.querySelector('#task-id') as HTMLInputElement).value || crypto.randomUUID(),
         name: (document.querySelector('#task-name') as HTMLInputElement).value,
-        desc: (document.querySelector('#task-desc') as HTMLTextAreaElement).value,
+        desc: descInput?.value || '',
         priority: (document.querySelector('#task-priority') as HTMLSelectElement).value as Priority,
         status: 'todo',
         storyId: activeStoryId,
@@ -454,9 +470,15 @@ tasksSection?.addEventListener('click', async (e) => {
         
         if (task && modal) {
             document.getElementById('modal-task-name')!.textContent = task.name;
-            document.getElementById('modal-task-desc')!.textContent = task.desc || 'No description';
-            document.getElementById('modal-task-status')!.textContent = task.status;
-            document.getElementById('modal-task-est')!.textContent = task.estimatedTime.toString();
+            
+            const descEl = document.getElementById('modal-task-desc');
+            if (descEl) descEl.textContent = task.desc || 'Brak opisu';
+            
+            const statusEl = document.getElementById('modal-task-status');
+            if (statusEl) statusEl.textContent = `Status: ${task.status}`;
+            
+            const estEl = document.getElementById('modal-task-est');
+            if (estEl) estEl.textContent = task.estimatedTime.toString();
             
             const users = await userService.getAllUsers();
             if (assignSelect) {
@@ -467,17 +489,18 @@ tasksSection?.addEventListener('click', async (e) => {
             }
             
             const assignSection = document.getElementById('assign-section');
-            const doneSection = document.getElementById('done-section');
+            const markDoneBtnModal = document.getElementById('mark-done-btn');
             
+            // логика переключения видимости кнопок
             if (task.status === 'todo') {
-                if (assignSection) assignSection.style.display = 'flex';
-                if (doneSection) doneSection.style.display = 'none';
+                if (assignSection) assignSection.classList.remove('hidden');
+                if (markDoneBtnModal) markDoneBtnModal.classList.add('hidden');
             } else if (task.status === 'doing') {
-                if (assignSection) assignSection.style.display = 'none';
-                if (doneSection) doneSection.style.display = 'block';
+                if (assignSection) assignSection.classList.add('hidden');
+                if (markDoneBtnModal) markDoneBtnModal.classList.remove('hidden');
             } else {
-                if (assignSection) assignSection.style.display = 'none';
-                if (doneSection) doneSection.style.display = 'none';
+                if (assignSection) assignSection.classList.add('hidden');
+                if (markDoneBtnModal) markDoneBtnModal.classList.add('hidden');
             }
             modal.showModal();
         }

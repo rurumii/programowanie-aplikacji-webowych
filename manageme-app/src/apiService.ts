@@ -2,6 +2,18 @@ import { appConfig } from './config';
 import { db } from './firebaseSetup';
 import { collection, doc, getDocs, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 
+/*
+ * api service и базы данных
+ * 
+ * 1. паттерн feature toggle: мы читаем настройку из config.ts. 
+ * если там 'firebase', вызываем методы firestore (getdocs, setdoc). 
+ * если 'local', работаем с localstorage.
+ * 
+ * 2. почему json.parse(json.stringify(item)) при сохранении в firebase?
+ * firestore падает с ошибкой, если попытаться сохранить объект, в котором 
+ * есть поля со значением undefined. эта конструкция быстро очищает объект 
+ * от пустых полей, превращая его в чистый json.
+ */
 export class ApiClient {
     async save<T extends {id: string}>(endpointKey: string, item: T): Promise<void> {
         if (appConfig.storageSystem === 'firebase') {

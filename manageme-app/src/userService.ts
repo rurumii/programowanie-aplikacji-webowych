@@ -9,6 +9,19 @@ export class UserService {
     
     private readonly SUPER_ADMIN_EMAIL = 'rurumiowo@gmail.com'; 
 
+
+    /*
+     * oauth и супер-админ
+     * 1. механика oauth: мы делегируем проверку пароля гуглу. 
+     * обратно получаем объект googleuser, откуда берем email и uid.
+     * 
+     * 2. хардкод админа: если email совпадает с super_admin_email, 
+     * мы принудительно назначаем роль 'admin'. всем остальным новым 
+     * пользователям по умолчанию дается роль 'guest'
+     * 
+     * 3. сессия: чтобы не логиниться при каждом f5, id юзера сохраняется 
+     * в localstorage под ключом manageme_active_user_id
+     */
     async loginWithGoogle(): Promise<{user: User, isNew: boolean} | null> {
         try {
             const result = await signInWithPopup(auth, googleProvider);

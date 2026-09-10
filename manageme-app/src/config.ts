@@ -5,6 +5,6 @@
  * приложение обратно на локальное хранилище без переписывания логики.
  */
 export const appConfig = {
-    // изменить на 'local', чтобы вернуть localStorage
     storageSystem: 'firebase' as 'local' | 'firebase' 
+    // storageSystem: 'local' as 'local' | 'firebase' 
 };
